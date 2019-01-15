@@ -16,6 +16,7 @@ const cli = meow(
   -d, --default-locale  default locale
   --flat                json [default: true] | yaml [default: false]
   --delimiter           json | yaml [default: .]
+  --keep                keep original json file only valid for json
 
   Example
   $ extract-messages --locales=ja,en --output app/translations 'app/**/*.js'

@@ -3,6 +3,7 @@ const path = require('path')
 const fs = require('fs')
 const mkdirp = require('mkdirp')
 const pick = require('lodash.pick')
+const merge = require('lodash.merge')
 const yaml = require('js-yaml')
 const pify = require('pify')
 const { flatten, unflatten } = require('flat')
@@ -11,7 +12,12 @@ const writeJsonFile = require('write-json-file')
 const extractReactIntl = require('extract-react-intl')
 const sortKeys = require('sort-keys')
 
-const writeJson = (outputPath, obj) => {
+const writeJson = (outputPath, obj, keep) => {
+  if (keep) {
+    const oldFile = fs.readFileSync(`${outputPath}.json`)
+    const oldObj = JSON.parse(oldFile)
+    obj = merge(obj, oldObj)
+  }
   return writeJsonFile(`${outputPath}.json`, obj, { indent: 2 })
 }
 
@@ -105,8 +111,9 @@ module.exports = async (locales, pattern, buildDir, opts) => {
         : unflatten(sortKeys(localeMap), { delimiter })
 
       const fn = isJson(opts.format) ? writeJson : writeYaml
+      const keep = opts.keep
 
-      return fn(path.resolve(buildDir, locale), fomattedLocaleMap)
+      return fn(path.resolve(buildDir, locale, keep), fomattedLocaleMap)
     })
   )
 }
